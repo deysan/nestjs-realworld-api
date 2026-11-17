@@ -23,3 +23,10 @@ npm-debug.log*
 # tests
 /coverage
 /.nyc_output
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Local tool settings
+.claude/
+.postman/

@@ -5,6 +5,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { typeOrmConfig } from './config/typeorm.config.js';
 import { TagModule } from './tag/tag.module.js';
+import { UserModule } from './user/user.module.js';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TagModule } from './tag/tag.module.js';
       useFactory: typeOrmConfig,
     }),
     TagModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

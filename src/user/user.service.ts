@@ -1,8 +1,10 @@
+import { compare } from 'bcrypt';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto.js';
+import { LoginUserDto } from './dto/loginUser.dto.js';
 import type { UserResponse } from './types/userResponse.interface.js';
 import { UserEntity } from './user.entity.js';
 
@@ -36,6 +38,32 @@ export class UserService {
       }
       throw error;
     }
+  }
+
+  async login(loginUserDto: LoginUserDto): Promise<UserEntity> {
+    // password has select: false; addSelect loads it on top of all the other
+    // columns, so new entity fields show up here without listing them.
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email: loginUserDto.email })
+      .getOne();
+
+    if (!user) {
+      throw new UnprocessableEntityException('Credentials are not valid');
+    }
+
+    const isPasswordCorrect = await compare(
+      loginUserDto.password,
+      user.password,
+    );
+
+    if (!isPasswordCorrect) {
+      // Same message as for an unknown email, so nobody can tell which emails exist.
+      throw new UnprocessableEntityException('Credentials are not valid');
+    }
+
+    return user;
   }
 
   private async ensureEmailAndUsernameAreFree({

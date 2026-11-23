@@ -18,7 +18,8 @@ export class UserEntity {
   @Column({ default: '' })
   image: string;
 
-  @Column()
+  // Never loaded by default: a query has to ask for the hash explicitly.
+  @Column({ select: false })
   password: string;
 
   @BeforeInsert()
